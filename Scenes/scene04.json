@@ -2,11 +2,25 @@
     "Eye": [500, 500, 1000],
     "Lights": [
         {
-            "position": [500, 500, 1000],
+            "position": [300, 700, 1000],
             "color": [1.0, 1.0, 1.0]
         }
     ],
     "Objects": [
+        {
+            "type": "plane",
+            "comment": "Background plane",
+            "position": [0, 0, -500],
+            "normal": [0, 0, 1],
+            "material":
+            {
+                "color": [0.55, 0.28, 0.08],
+                "ka": 0.2,
+                "kd": 0.7,
+                "ks": 0.5,
+                "n": 64
+            }
+        },
         {
             "type": "mesh",
             "model": "../Models/cat.obj",

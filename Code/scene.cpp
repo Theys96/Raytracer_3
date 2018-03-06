@@ -25,7 +25,7 @@ Hit Scene::findMinHit(Ray const &ray, ObjectPtr* obj) {
     return min_hit;
 }
 
-Color Scene::trace(Ray const &ray)
+Color Scene::trace(Ray const &ray, bool specularOnly, int reflection)
 {
     // Find hit object and distance
     ObjectPtr obj = nullptr;
@@ -47,24 +47,56 @@ Color Scene::trace(Ray const &ray)
         Vector light = lights[i]->position - hit;
         Vector L = (light).normalized();
 
-        //if (shadows) {
-            // Check clear path to light source
+        bool castShadow = false;
+        if (shadows) {
             Ray lightRay(hit, L);
             Hit shadowHit = findMinHit(lightRay, &shadowObj);
-        //}
-        if (!shadows || shadowHit.t > light.length()) {
+            castShadow = shadowHit.t < light.length();
+        }
+
+        if (!castShadow) {
             Vector R = 2*(N.dot(L))*N - L;
             I_d += lights[i]->color * fmax(0, L.dot(N));
             I_s += lights[i]->color * pow(fmax(0, R.dot(V)), material.n);
         }
     }
+
+    if (reflection > 0) {
+        Vector O = 2*(N.dot(V))*N - V;
+        I_s += trace(Ray(hit, O), false, reflection-1);
+    }
+
     I_d *= material.kd;
     I_s *= material.ks;
 
 
     Color I = material.ka+I_d;
 
-    return I_s + (I * material.color);
+    return I_s + (specularOnly ? Triple(0,0,0) : I * material.color);
+}
+
+Color Scene::renderPixel(int x, int y, int w, int h) {
+    std::vector<Color> samples;
+
+    double base = 1/(double)(2*superSamplingFactor);
+    double step = 1/(double)superSamplingFactor;
+    for (int i = 1; i <= superSamplingFactor; i++) {
+        for (int j = 1; j <= superSamplingFactor; j++) {
+            Point samplePoint(x + base + i*step, h - 1 - y + base + j*step, 0);
+            Ray ray(eye, (samplePoint - eye).normalized());
+            Color col = trace(ray, false, recursionDepth);
+            col.clamp();
+            samples.push_back(col);
+        }
+    }
+
+    Color col(0,0,0);
+    for (int i = 0; i < samples.size(); i++) {
+        col += samples[i];
+    }
+    col /= samples.size();
+
+    return col;
 }
 
 void Scene::render(Image &img)
@@ -75,11 +107,7 @@ void Scene::render(Image &img)
     {
         for (unsigned x = 0; x < w; ++x)
         {
-            Point pixel(x + 0.5, h - 1 - y + 0.5, 0);
-            Ray ray(eye, (pixel - eye).normalized());
-            Color col = trace(ray);
-            col.clamp();
-            img(x, y) = col;
+            img(x, y) = renderPixel(x, y, w, h);
         }
         cout << y << " ";
         if ((y+1)%10 == 0) {
@@ -103,6 +131,21 @@ void Scene::addLight(Light const &light)
 void Scene::setEye(Triple const &position)
 {
     eye = position;
+}
+
+void Scene::setShadows(bool const &s)
+{
+    shadows = s;
+}
+
+void Scene::setRecursionDepth(int const &depth)
+{
+    recursionDepth = depth;
+}
+
+void Scene::setSuperSamplingFactor(int const &factor) 
+{
+    superSamplingFactor = factor;
 }
 
 unsigned Scene::getNumObject()
