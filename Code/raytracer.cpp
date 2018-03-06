@@ -41,7 +41,14 @@ bool Raytracer::parseObjectNode(json const &node)
     {
         Point pos(node["position"]);
         double radius = node["radius"];
-        obj = ObjectPtr(new Sphere(pos, radius));
+        Sphere* sphere = new Sphere(pos, radius);
+
+        string textureFile = node["material"].value("texture", "");
+        if (textureFile != "") {
+            sphere->setTexture(sceneDir+"/"+textureFile);
+        }
+
+        obj = ObjectPtr(sphere);
     } else if (node["type"] == "triangle")
     {
         Point v0(node["v0"]);
@@ -114,11 +121,17 @@ Light Raytracer::parseLightNode(json const &node) const
 
 Material Raytracer::parseMaterialNode(json const &node) const
 {
-    Color color(node["color"]);
+    string tex = node.value("texture", "");
+    Color color;
+    if (tex == "") {
+        Color color2(node["color"]);
+        color = color2;
+    }
     double ka = node["ka"];
     double kd = node["kd"];
     double ks = node["ks"];
     double n  = node["n"];
+
     return Material(color, ka, kd, ks, n);
 }
 
@@ -130,6 +143,9 @@ try
     if (!infile) throw runtime_error("Could not open input file for reading.");
     json jsonscene;
     infile >> jsonscene;
+
+    sceneDir = ifname;
+    sceneDir.erase(sceneDir.begin() + sceneDir.find_last_of('/'), sceneDir.end());
 
 // =============================================================================
 // -- Read your scene data in this section -------------------------------------

@@ -50,3 +50,7 @@ Triangle::Triangle(
     norm2(norm2)
 {
 }
+
+Color Triangle::colorAt(Point const &point) {
+    return material.color;
+}

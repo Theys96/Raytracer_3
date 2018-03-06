@@ -14,6 +14,7 @@ class Material;
 class Raytracer
 {
     Scene scene;
+    std::string sceneDir;
 
     public:
 

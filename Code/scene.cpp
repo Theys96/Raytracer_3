@@ -38,6 +38,7 @@ Color Scene::trace(Ray const &ray, bool specularOnly, int reflection)
     Point hit = ray.at(min_hit.t);                 //the hit point
     Vector N = min_hit.N;                          //the normal at hit point
     Vector V = -ray.D;                             //the view vector
+    Color materialColor = obj->colorAt(hit);
 
     Color I_d;
     Color I_s;
@@ -72,7 +73,7 @@ Color Scene::trace(Ray const &ray, bool specularOnly, int reflection)
 
     Color I = material.ka+I_d;
 
-    return I_s + (specularOnly ? Triple(0,0,0) : I * material.color);
+    return I_s + (specularOnly ? Triple(0,0,0) : I * materialColor);
 }
 
 Color Scene::renderPixel(int x, int y, int w, int h) {

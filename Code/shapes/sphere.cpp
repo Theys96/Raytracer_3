@@ -55,3 +55,23 @@ Sphere::Sphere(Point const &pos, double radius)
     position(pos),
     r(radius)
 {}
+
+void Sphere::setTexture(std::string path) {
+    texture = Image(path);
+    usingTexture = true;
+}
+
+Color Sphere::colorAt(Point const &point) {
+    if (usingTexture) {
+        Vector radius = point - position;
+
+        double theta = acos(radius.z/r);
+        double phi = atan2(radius.y, radius.x);
+        if (phi < 0) phi += 2*M_PI;
+        theta = M_PI-theta;
+        double u = phi/(2*M_PI);
+        double v = (M_PI - theta)/M_PI;
+        return texture.colorAt(u,v);
+    }
+    return material.color;
+}

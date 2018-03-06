@@ -22,3 +22,7 @@ Plane::Plane(Point const &pos, Vector const &normal)
     pos(pos),
     norm(normal)
 {}
+
+Color Plane::colorAt(Point const &point) {
+	return material.color;
+}

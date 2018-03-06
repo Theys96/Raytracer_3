@@ -41,3 +41,7 @@ Quad::Quad(Point const &v0, Point const &v1, Point const &v2, Point const &v3)
     triangles.push_back(ObjectPtr(new Triangle(v0, v1, v2, n2, n1, n2)));
     triangles.push_back(ObjectPtr(new Triangle(v0, v2, v3, n2, n2, n3)));
 }
+
+Color Quad::colorAt(Point const &point) {
+    return material.color;
+}

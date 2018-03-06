@@ -10,6 +10,7 @@ class Quad: public Object
         Quad(Point const &v0, Point const &v1, Point const &v2, Point const &v3);
 
         virtual Hit intersect(Ray const &ray);
+        virtual Color colorAt(Point const &point);
 
         std::vector<ObjectPtr> triangles;
 };
