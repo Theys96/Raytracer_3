@@ -11,20 +11,25 @@
 
 using namespace std;
 
-Color Scene::trace(Ray const &ray)
-{
-    // Find hit object and distance
+Hit Scene::findMinHit(Ray const &ray, ObjectPtr* obj) {
     Hit min_hit(numeric_limits<double>::infinity(), Vector());
-    ObjectPtr obj = nullptr;
     for (unsigned idx = 0; idx != objects.size(); ++idx)
     {
         Hit hit(objects[idx]->intersect(ray));
-        if (hit.t < min_hit.t)
+        if (hit.t < min_hit.t && hit.t > 0.00000001)
         {
             min_hit = hit;
-            obj = objects[idx];
+            *obj = objects[idx];
         }
     }
+    return min_hit;
+}
+
+Color Scene::trace(Ray const &ray)
+{
+    // Find hit object and distance
+    ObjectPtr obj = nullptr;
+    Hit min_hit = findMinHit(ray, &obj);
 
     // No hit? Return background color.
     if (!obj) return Color(0.0, 0.0, 0.0);
@@ -36,11 +41,22 @@ Color Scene::trace(Ray const &ray)
 
     Color I_d;
     Color I_s;
+    ObjectPtr shadowObj;
     for (int i = 0; i < lights.size(); i++) {
-        Vector L = (lights[i]->position - hit).normalized();
-        Vector R = 2*(N.dot(L))*N - L;
-        I_d += lights[i]->color * fmax(0, L.dot(N));
-        I_s += lights[i]->color * pow(fmax(0, R.dot(V)), material.n);
+
+        Vector light = lights[i]->position - hit;
+        Vector L = (light).normalized();
+
+        //if (shadows) {
+            // Check clear path to light source
+            Ray lightRay(hit, L);
+            Hit shadowHit = findMinHit(lightRay, &shadowObj);
+        //}
+        if (!shadows || shadowHit.t > light.length()) {
+            Vector R = 2*(N.dot(L))*N - L;
+            I_d += lights[i]->color * fmax(0, L.dot(N));
+            I_s += lights[i]->color * pow(fmax(0, R.dot(V)), material.n);
+        }
     }
     I_d *= material.kd;
     I_s *= material.ks;
@@ -65,7 +81,10 @@ void Scene::render(Image &img)
             col.clamp();
             img(x, y) = col;
         }
-        cout << y << "\n";
+        cout << y << " ";
+        if ((y+1)%10 == 0) {
+            cout << "\n";
+        }
     }
 }
 

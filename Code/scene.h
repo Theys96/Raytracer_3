@@ -16,11 +16,13 @@ class Scene
     std::vector<ObjectPtr> objects;
     std::vector<LightPtr> lights;   // no ptr needed, but kept for consistency
     Point eye;
+    bool shadows = true;
 
     public:
 
         // trace a ray into the scene and return the color
         Color trace(Ray const &ray);
+        Hit findMinHit(Ray const &ray, ObjectPtr* obj);
 
         // render the scene to the given image
         void render(Image &img);
