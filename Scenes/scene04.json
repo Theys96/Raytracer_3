@@ -1,0 +1,23 @@
+{
+    "Eye": [500, 500, 1000],
+    "Lights": [
+        {
+            "position": [500, 500, 1000],
+            "color": [1.0, 1.0, 1.0]
+        }
+    ],
+    "Objects": [
+        {
+            "type": "mesh",
+            "model": "../Models/cat.obj",
+            "material":
+            {
+                "color": [0.2, 0.8, 0.8],
+                "ka": 0.2,
+                "kd": 0.7,
+                "ks": 0.5,
+                "n": 64
+            }
+        }
+    ]
+}
