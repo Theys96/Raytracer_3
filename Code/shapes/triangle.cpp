@@ -51,6 +51,16 @@ Triangle::Triangle(
 {
 }
 
+void Triangle::translate(Vector translation) {
+	v0 += translation;
+}
+
+void Triangle::scale(double factor) {
+	v0 *= factor;
+	e1 *= factor;
+	e2 *= factor;
+}
+
 Color Triangle::colorAt(Point const &point) {
     return material.color;
 }

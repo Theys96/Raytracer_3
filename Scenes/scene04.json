@@ -1,5 +1,6 @@
 {
     "Eye": [500, 500, 1000],
+    "Shadows": false,
     "Lights": [
         {
             "position": [300, 700, 1000],
@@ -24,6 +25,8 @@
         {
             "type": "mesh",
             "model": "../Models/cat.obj",
+            "scaling": 400,
+            "translation": [200, 100, 0],
             "material":
             {
                 "color": [0.2, 0.8, 0.8],
