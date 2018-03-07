@@ -25,7 +25,18 @@ Hit Scene::findMinHit(Ray const &ray, ObjectPtr* obj) {
     return min_hit;
 }
 
-Color Scene::trace(Ray const &ray, bool specularOnly, int reflection)
+/*
+ * Checks if a point is block is blocked in a certain direction,
+ * up to a certain distance.
+ */
+bool Scene::isBlocked(Point point, Vector direction, double maxDistance) {
+    ObjectPtr shadowObj;
+    Ray lightRay(point, direction);
+    Hit shadowHit = findMinHit(lightRay, &shadowObj);
+    return shadowHit.t < maxDistance;
+}
+
+Color Scene::trace(Ray const &ray, int reflection)
 {
     // Find hit object and distance
     ObjectPtr obj = nullptr;
@@ -34,46 +45,36 @@ Color Scene::trace(Ray const &ray, bool specularOnly, int reflection)
     // No hit? Return background color.
     if (!obj) return Color(0.0, 0.0, 0.0);
 
-    Material material = obj->material;          //the hit objects material
-    Point hit = ray.at(min_hit.t);                 //the hit point
-    Vector N = min_hit.N;                          //the normal at hit point
-    Vector V = -ray.D;                             //the view vector
-    Color materialColor = obj->colorAt(hit);
+    Material material = obj->material;     // The hit objects material
+    Point hit = ray.at(min_hit.t);         // The hit point
+    Vector N = min_hit.N;                  // The normal at hit point
+    Vector V = -ray.D;                     // The view vector
+    Color  I_d;                            // Diffuse light intensity, to be calculated
+    Color  I_s;                            // Specular light intensity, to be calculated
+    double I_a = material.ka;              // Ambient light intensity
 
-    Color I_d;
-    Color I_s;
-    ObjectPtr shadowObj;
+    /* Lights calculation */
     for (int i = 0; i < lights.size(); i++) {
-
         Vector light = lights[i]->position - hit;
         Vector L = (light).normalized();
-
-        bool castShadow = false;
-        if (shadows) {
-            Ray lightRay(hit, L);
-            Hit shadowHit = findMinHit(lightRay, &shadowObj);
-            castShadow = shadowHit.t < light.length();
-        }
-
-        if (!castShadow) {
+        if (!shadows || !isBlocked(hit, L, light.length())) {
             Vector R = 2*(N.dot(L))*N - L;
             I_d += lights[i]->color * fmax(0, L.dot(N));
             I_s += lights[i]->color * pow(fmax(0, R.dot(V)), material.n);
         }
     }
 
+    /* Reflection calculation */
     if (reflection > 0) {
         Vector O = 2*(N.dot(V))*N - V;
-        I_s += trace(Ray(hit, O), false, reflection-1);
+        I_s += trace(Ray(hit, O), reflection-1);
     }
 
+    /* Final combination */
     I_d *= material.kd;
     I_s *= material.ks;
-
-
-    Color I = material.ka+I_d;
-
-    return I_s + (specularOnly ? Triple(0,0,0) : I * materialColor);
+    Color I = I_a + I_d;
+    return I_s + I * obj->colorAt(hit);
 }
 
 Color Scene::renderPixel(int x, int y, int w, int h) {
@@ -83,21 +84,21 @@ Color Scene::renderPixel(int x, int y, int w, int h) {
     double step = 1/(double)superSamplingFactor;
     for (int i = 1; i <= superSamplingFactor; i++) {
         for (int j = 1; j <= superSamplingFactor; j++) {
+            /* Raytracing a single sub-pixel */
             Point samplePoint(x + base + i*step, h - 1 - y + base + j*step, 0);
             Ray ray(eye, (samplePoint - eye).normalized());
-            Color col = trace(ray, false, recursionDepth);
+            Color col = trace(ray, recursionDepth);
             col.clamp();
             samples.push_back(col);
         }
     }
 
+    /* Find average pixel */
     Color col(0,0,0);
     for (int i = 0; i < samples.size(); i++) {
         col += samples[i];
     }
-    col /= samples.size();
-
-    return col;
+    return col / samples.size();
 }
 
 void Scene::render(Image &img)
