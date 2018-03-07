@@ -7,6 +7,15 @@ University of Groningen.
 This framework is inspired by and uses (some) code of the raytracer framework of
 Bert Freudenberg which unfortunately is no longer available.
 
+## Implemented in this assignment ("Raytracer_2")
+
+* Implemented shadows as an option in the scene source file. Default is **true**.
+* Implemented reflection. The option MaxRecursionDepth in the source file determines the degree of reflection and default is **0**, no reflection.
+* Implemented anti-aliasing. Again, this is optional and the option SuperSamplingFactor can be set for example to 4 for 4x4 anti-aliasing. Default is **1** (no anti-aliasing).
+* Implemented texturing spheres using Miller projection from a PNG texture file.
+* Implemented output picture resolution as an option in the scene source file. The viewport is always 400x400, but the resolution of the output picture can be set although default is **400** for a 400x400 output picture.
+* Did a lot of refactoring on the existing code.
+
 ## Compiling the code
 
 We provided a [CMakeLists.txt](CMakeLists.txt) file to be used with `cmake`.
