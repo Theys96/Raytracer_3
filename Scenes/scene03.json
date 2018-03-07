@@ -1,4 +1,6 @@
 {
+    "Resolution": 4000,
+    "SuperSamplingFactor": 4,
     "Eye": [200, 200, 1000],
     "Lights": [
         {

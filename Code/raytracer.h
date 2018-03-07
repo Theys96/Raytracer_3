@@ -15,6 +15,7 @@ class Raytracer
 {
     Scene scene;
     std::string sceneDir;
+    int resolution;
 
     public:
 
@@ -23,6 +24,7 @@ class Raytracer
 
     private:
 
+    	void setResolution(int res);
         bool parseObjectNode(nlohmann::json const &node);
 
         Light parseLightNode(nlohmann::json const &node) const;

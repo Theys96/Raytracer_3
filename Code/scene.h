@@ -23,12 +23,13 @@ class Scene
     public:
 
         // trace a ray into the scene and return the color
-        Color trace(Ray const &ray, bool specularOnly, int reflection);
+        Color trace(Ray const &ray, int reflection);
         Hit findMinHit(Ray const &ray, ObjectPtr* obj);
+        bool isBlocked(Point point, Vector direction, double maxDistance);
 
         // render the scene to the given image
         void render(Image &img);
-        Color renderPixel(int x, int y, int w, int h);
+        Color renderPixel(double x, double y, double pixelSize);
 
         void addObject(ObjectPtr obj);
         void addLight(Light const &light);

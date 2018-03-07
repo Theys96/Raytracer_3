@@ -14,6 +14,7 @@
 #include "shapes/triangle.h"
 #include "shapes/plane.h"
 #include "shapes/quad.h"
+#include "shapes/mesh.h"
 
 // =============================================================================
 // -- End of shape includes ----------------------------------------------------
@@ -62,23 +63,14 @@ bool Raytracer::parseObjectNode(json const &node)
     } else if (node["type"] == "mesh")
     {
         string model = node["model"];
-        Material material = parseMaterialNode(node["material"]);
-        OBJLoader obj = OBJLoader(model);
-        vector<Vertex> vertices = obj.vertex_data();
-        for (uint i = 0; i < vertices.size(); i += 3) {
-            // Hardcoded transformation
-            // TODO: not hardcode the transformation
-            Point v0 = Point(vertices[i+0].x*400+200, vertices[i+0].y*400+100, vertices[i+0].z*400);
-            Vector n0 = Vector(vertices[i+0].nx, vertices[i+0].ny, vertices[i+0].nz);
-            Point v1 = Point(vertices[i+1].x*400+200, vertices[i+1].y*400+100, vertices[i+1].z*400);
-            Vector n1 = Vector(vertices[i+1].nx, vertices[i+1].ny, vertices[i+1].nz);
-            Point v2 = Point(vertices[i+2].x*400+200, vertices[i+2].y*400+100, vertices[i+2].z*400);
-            Vector n2 = Vector(vertices[i+2].nx, vertices[i+2].ny, vertices[i+2].nz);
-            ObjectPtr obj = ObjectPtr(new Triangle(v0, v1, v2, n0, n1, n2));
-            obj->material = material;
-            scene.addObject(obj);
+        Vector translation(0,0,0);
+        if (node["translation"].is_array()) {
+            translation = Vector(node["translation"]);
         }
-        return true;
+        Mesh* mesh = new Mesh(model);
+        mesh->scale(node.value("scaling",1));
+        mesh->translate(translation);
+        obj = ObjectPtr(mesh);
     } else
     {
         cerr << "Unknown object type: " << node["type"] << ".\n";
@@ -149,6 +141,9 @@ try
     int factor = jsonscene.value("SuperSamplingFactor", 1);
     scene.setSuperSamplingFactor(factor);
 
+    int res = jsonscene.value("Resolution", 400);
+    setResolution(res);
+
     for (auto const &lightNode : jsonscene["Lights"])
         scene.addLight(parseLightNode(lightNode));
 
@@ -171,10 +166,14 @@ catch (exception const &ex)
     return false;
 }
 
+void Raytracer::setResolution(int res) {
+    resolution = res;
+}
+
 void Raytracer::renderToFile(string const &ofname)
 {
     // TODO: the size may be a settings in your file
-    Image img(400, 400);
+    Image img(resolution, resolution);
     cout << "Tracing...\n";
     scene.render(img);
     cout << "Writing image to " << ofname << "...\n";

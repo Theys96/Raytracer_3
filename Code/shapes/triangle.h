@@ -11,12 +11,15 @@ class Triangle: public Object
         	Point const &v0, Point const &v1, Point const &v2,
         	Vector norm0, Vector norm1, Vector norm2);
 
+        void translate(Vector translation);
+        void scale(double factor);
+
         virtual Hit intersect(Ray const &ray);
         virtual Color colorAt(Point const &point);
 
-        Point const v0;
-        Point const e1;
-        Point const e2;
+        Point v0;
+        Point e1;
+        Point e2;
         Vector norm0;
         Vector norm1;
         Vector norm2;
