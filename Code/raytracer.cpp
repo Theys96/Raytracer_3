@@ -31,7 +31,6 @@ using json = nlohmann::json;
 bool Raytracer::parseObjectNode(json const &node)
 {
     ObjectPtr obj = nullptr;
-    ObjectPtr obj2 = nullptr;
 
 // =============================================================================
 // -- Determine type and parse object parametrers ------------------------------
@@ -41,14 +40,7 @@ bool Raytracer::parseObjectNode(json const &node)
     {
         Point pos(node["position"]);
         double radius = node["radius"];
-        Sphere* sphere = new Sphere(pos, radius);
-
-        string textureFile = node["material"].value("texture", "");
-        if (textureFile != "") {
-            sphere->setTexture(sceneDir+"/"+textureFile);
-        }
-
-        obj = ObjectPtr(sphere);
+        obj = ObjectPtr(new Sphere(pos, radius));
     } else if (node["type"] == "triangle")
     {
         Point v0(node["v0"]);
@@ -61,7 +53,6 @@ bool Raytracer::parseObjectNode(json const &node)
         Point v1(node["v1"]);
         Point v2(node["v2"]);
         Point v3(node["v3"]);
-
         obj = ObjectPtr(new Quad(v0, v1, v2, v3));
     } else if (node["type"] == "plane")
     {
@@ -104,11 +95,6 @@ bool Raytracer::parseObjectNode(json const &node)
     obj->material = parseMaterialNode(node["material"]);
     scene.addObject(obj);
     
-    if (obj2) {
-		obj2->material = parseMaterialNode(node["material"]);
-		scene.addObject(obj2);
-	}
-    
     return true;
 }
 
@@ -121,18 +107,18 @@ Light Raytracer::parseLightNode(json const &node) const
 
 Material Raytracer::parseMaterialNode(json const &node) const
 {
-    string tex = node.value("texture", "");
-    Color color;
-    if (tex == "") {
-        Color color2(node["color"]);
-        color = color2;
-    }
     double ka = node["ka"];
     double kd = node["kd"];
     double ks = node["ks"];
     double n  = node["n"];
 
-    return Material(color, ka, kd, ks, n);
+    string tex = node.value("texture", "");
+    if (tex == "") {
+        Color color(node["color"]);
+        return Material(color, ka, kd, ks, n);
+    } else {
+        return Material(sceneDir+"/"+tex, ka, kd, ks, n);
+    }
 }
 
 bool Raytracer::readScene(string const &ifname)
