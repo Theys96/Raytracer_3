@@ -34,16 +34,30 @@ Sphere::Sphere(Point const &pos, double radius)
 Color Sphere::colorAt(Point const &point) {
     if (material.usingTexture) {
         Vector radius = point - position;
+        if (rotation) {
+            // Rodrigues' rotation formula
+            radius = 
+                cos(rotationAngle)*radius +
+                sin(rotationAngle)*(rotationAxis.cross(radius)) +
+                (1 - cos(rotationAngle))*(rotationAxis.dot(radius))*rotationAxis;
+        }
         double theta = acos(radius.z/r);
-        double phi = atan2(radius.y, radius.x);
+        double phi = atan2(radius.y, radius.x) - phiRotation;
 
-        if (phi < 0) phi += 2*M_PI;
-
-        theta = M_PI-theta;
+        while (phi < 0) phi += 2*M_PI;
+        
         double u = phi/(2*M_PI);
-        double v = (M_PI - theta)/M_PI;
+        double v = theta/M_PI;
         
         return material.texture->colorAt(u,v);
     }
     return material.color;
+}
+
+void Sphere::setRotation(Vector axis, double angle) {
+    rotationAxis = axis.normalized().cross(Vector(0,0,1));
+    rotationAngle = rotationAxis.length();
+    rotationAxis.normalize();
+    phiRotation = angle/180*M_PI;
+    rotation = true;
 }

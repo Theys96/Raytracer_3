@@ -41,7 +41,13 @@ bool Raytracer::parseObjectNode(json const &node)
     {
         Point pos(node["position"]);
         double radius = node["radius"];
-        obj = ObjectPtr(new Sphere(pos, radius));
+        Sphere* sphere = new Sphere(pos, radius);
+        if (node.find("rotation") != node.end() && node.find("angle") != node.end()) {
+            Vector rotation(node["rotation"]);
+            double angle(node["angle"]);
+            sphere->setRotation(rotation, angle);
+        }
+        obj = ObjectPtr(sphere);
     } else if (node["type"] == "triangle")
     {
         Point v0(node["v0"]);
@@ -64,7 +70,7 @@ bool Raytracer::parseObjectNode(json const &node)
     {
         string model = node["model"];
         Vector translation(0,0,0);
-        if (node["translation"].is_array()) {
+        if (node.find("translation") != node.end()) {
             translation = Vector(node["translation"]);
         }
         Mesh* mesh = new Mesh(model);
