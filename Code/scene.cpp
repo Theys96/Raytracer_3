@@ -11,6 +11,13 @@
 
 using namespace std;
 
+// The "viewport" of the image is always 400x400.
+// E.g. it stretches from (0,0,0), top-left to
+// (400,400,0), bottom-right.
+// However, the resolution of this viewport can be higher
+// or lower if defined as such in the source file.
+#define VIEWPORT_SIZE 400
+
 Hit Scene::findMinHit(Ray const &ray, ObjectPtr* obj) {
     Hit min_hit(numeric_limits<double>::infinity(), Vector());
     for (unsigned idx = 0; idx != objects.size(); ++idx)
@@ -77,15 +84,15 @@ Color Scene::trace(Ray const &ray, int reflection)
     return I_s + I * obj->colorAt(hit);
 }
 
-Color Scene::renderPixel(int x, int y, int w, int h) {
+Color Scene::renderPixel(double x, double y, double pixelSize) {
     std::vector<Color> samples;
-
-    double base = 1/(double)(2*superSamplingFactor);
-    double step = 1/(double)superSamplingFactor;
+    
+    double base = pixelSize/(double)(2*superSamplingFactor);
+    double step = pixelSize/(double)superSamplingFactor;
     for (int i = 1; i <= superSamplingFactor; i++) {
         for (int j = 1; j <= superSamplingFactor; j++) {
             /* Raytracing a single sub-pixel */
-            Point samplePoint(x + base + i*step, h - 1 - y + base + j*step, 0);
+            Point samplePoint(x + base + i*step, y + base + j*step, 0);
             Ray ray(eye, (samplePoint - eye).normalized());
             Color col = trace(ray, recursionDepth);
             col.clamp();
@@ -105,17 +112,23 @@ void Scene::render(Image &img)
 {
     unsigned w = img.width();
     unsigned h = img.height();
+    unsigned resolution = h;
     for (unsigned y = 0; y < h; ++y)
     {
         for (unsigned x = 0; x < w; ++x)
         {
-            img(x, y) = renderPixel(x, y, w, h);
+            // This will stretch the picture if it is not a square
+            // Transforming the pixels to in-viewport pixels
+            // e.g. [0,resolution] -> [0,400]
+            img(x, y) = renderPixel(
+                (double)x/resolution*VIEWPORT_SIZE, 
+                VIEWPORT_SIZE - 1 - (double)y/resolution*VIEWPORT_SIZE, 
+                VIEWPORT_SIZE/(double)resolution
+            );
         }
-        cout << y << " ";
-        if ((y+1)%10 == 0) {
-            cout << "\n";
-        }
+        if (y%100 == 0) cout << y/100 << "\t" << std::flush;
     }
+    cout << "\n";
 }
 
 // --- Misc functions ----------------------------------------------------------

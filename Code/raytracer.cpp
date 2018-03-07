@@ -141,6 +141,9 @@ try
     int factor = jsonscene.value("SuperSamplingFactor", 1);
     scene.setSuperSamplingFactor(factor);
 
+    int res = jsonscene.value("Resolution", 400);
+    setResolution(res);
+
     for (auto const &lightNode : jsonscene["Lights"])
         scene.addLight(parseLightNode(lightNode));
 
@@ -163,10 +166,14 @@ catch (exception const &ex)
     return false;
 }
 
+void Raytracer::setResolution(int res) {
+    resolution = res;
+}
+
 void Raytracer::renderToFile(string const &ofname)
 {
     // TODO: the size may be a settings in your file
-    Image img(400, 400);
+    Image img(resolution, resolution);
     cout << "Tracing...\n";
     scene.render(img);
     cout << "Writing image to " << ofname << "...\n";

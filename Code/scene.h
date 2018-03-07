@@ -29,7 +29,7 @@ class Scene
 
         // render the scene to the given image
         void render(Image &img);
-        Color renderPixel(int x, int y, int w, int h);
+        Color renderPixel(double x, double y, double pixelSize);
 
         void addObject(ObjectPtr obj);
         void addLight(Light const &light);
