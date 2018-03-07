@@ -19,6 +19,7 @@ class Object
 
         virtual ~Object() = default;
 
+        virtual Color colorAt(Point const &point) = 0;
         virtual Hit intersect(Ray const &ray) = 0;  // must be implemented
                                                     // in derived class
 };

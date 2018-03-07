@@ -12,6 +12,7 @@ class Triangle: public Object
         	Vector norm0, Vector norm1, Vector norm2);
 
         virtual Hit intersect(Ray const &ray);
+        virtual Color colorAt(Point const &point);
 
         Point const v0;
         Point const e1;
