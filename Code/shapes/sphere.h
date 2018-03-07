@@ -6,11 +6,17 @@
 
 class Sphere: public Object
 {
+	Vector rotationAxis;
+	double rotationAngle;
+	double phiRotation = 0;
+	bool rotation = false;
+
 	public:
         Sphere(Point const &pos, double radius);
 
         virtual Hit intersect(Ray const &ray);
         virtual Color colorAt(Point const &point);
+        void setRotation(Vector axis, double angle);
 
         Point const position;
         double const r;
