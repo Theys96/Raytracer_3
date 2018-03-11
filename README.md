@@ -1,4 +1,28 @@
-# Raytracer C++ framework for Introduction to Computer Graphics
+# Introduction to Computer Graphics - Raytracer assignment 2
+
+In this assignment, we did the following.
+
+* **Implemented shadows as an option in the scene source file. Default is true**.
+The algorithm simply shoots another ray in the direction of the light source from the hit-point. If there is a hit at a lower distance than the light, diffuse and specular light is omitted and not emitted.
+
+* **Implemented reflection. The option MaxRecursionDepth in the source file determines the degree of reflection and default is 0, no reflection.**
+Again, the algorithm shoot another ray from the hit-point, this time in the direction of the reflected view-vector. It records the color (if any) at the end of the ray and adds it to the specular light intensity.
+
+* **Implemented anti-aliasing. Again, this is optional and the option SuperSamplingFactor can be set for example to 4 for 4x4 anti-aliasing. Default is 1 (no anti-aliasing).**
+The algorithm has been extended to compute for a single pixel a variable amount of from-eye-rays or subpixels. These are divided as suggested in the assignment and averaged to get the color of the pixel. The anti-aliasing seems to work rather well and increase in image quality can be seen until around 8x8.
+
+* **Implemented output picture resolution as an option in the scene source file. The viewport is always 400x400, but the resolution of the output picture can be set although default is 400 for a 400x400 output picture.**
+Similarly to anti-aliasing, we extended the accepted JSON-language to accept a resolution number such that the output picture will be of size (resolution)x(resolution). If a higher (or lower) resolution than 400 is in fact chosen, the virtual pixels are chosen denser such that, for example, 1000x1000 pixels are a condensed in our viewport which still always stretches from (0,0,0) to (400,400,0). This works well together with anti-aliasing. 
+
+* **Implemented texturing spheres using Miller projection from a PNG texture file.**
+The texturing of spheres has been done using the algorithm from the book, which basically calculates the hit-point on the sphere to angles from the center of the sphere which can in turn be translated to coordinates in the texture map.
+
+* **Implemented rotating (textured) spheres.**
+We kept the rotation method as provided in the example source files. First, the initial position vector on the sphere is rotated by a rotation that is acquired by trying to rotate the (0,0,1) point on the sphere to a given vector. In our implementation, we did this by means of a cross product which gives us both an axis (the resulting vector, normalized) and an angle (the length of the resulting vector). We then use Rodrigues' rotation formula to execute this rotation. Then, we also rotate the texture with a given angle around the new north-south axis which can be simply done by subtracting the angle from our phi (=atan2(Δy, Δx)) angle, used for finding the texture-coordinates.
+
+* Did a lot of refactoring on the existing code.
+
+## Raytracer C++ framework
 
 This is a C++ framework for a raytracer. It is created for the Computer
 Science course "Introduction to Computer Graphics" taught at the
@@ -6,15 +30,6 @@ University of Groningen.
 
 This framework is inspired by and uses (some) code of the raytracer framework of
 Bert Freudenberg which unfortunately is no longer available.
-
-## Implemented in this assignment ("Raytracer_2")
-
-* Implemented shadows as an option in the scene source file. Default is **true**.
-* Implemented reflection. The option MaxRecursionDepth in the source file determines the degree of reflection and default is **0**, no reflection.
-* Implemented anti-aliasing. Again, this is optional and the option SuperSamplingFactor can be set for example to 4 for 4x4 anti-aliasing. Default is **1** (no anti-aliasing).
-* Implemented texturing spheres using Miller projection from a PNG texture file.
-* Implemented output picture resolution as an option in the scene source file. The viewport is always 400x400, but the resolution of the output picture can be set although default is **400** for a 400x400 output picture.
-* Did a lot of refactoring on the existing code.
 
 ## Compiling the code
 
