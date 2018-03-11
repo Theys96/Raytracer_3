@@ -55,9 +55,21 @@ Color Sphere::colorAt(Point const &point) {
 }
 
 void Sphere::setRotation(Vector axis, double angle) {
-    rotationAxis = axis.normalized().cross(Vector(0,0,1));
-    rotationAngle = rotationAxis.length();
-    rotationAxis.normalize();
+	if (axis.x == 0 && axis.y == 0) {
+		rotationAxis = Vector(1,0,0);
+		if (axis.z > 1) {
+			rotationAngle = 0;
+		} else {
+			rotationAngle = M_PI;
+		}
+	} else {
+		axis.normalize();
+		rotationAxis = axis.cross(Vector(0,0,1));
+		int sign = axis.z > 0 ? axis.z/abs(axis.z) : 1;
+		rotationAngle = asin(rotationAxis.length() * sign);
+		if (rotationAngle < 0) rotationAngle += M_PI;
+		rotationAxis.normalize();
+	}
     phiRotation = angle/180*M_PI;
     rotation = true;
 }
