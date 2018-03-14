@@ -54,7 +54,7 @@ Mesh::Mesh()
 Mesh::Mesh(std::string filename) {
     OBJLoader objLoader = OBJLoader(filename);
     vector<Vertex> vertices = objLoader.vertex_data();
-    for (uint i = 0; i < vertices.size(); i += 3) {
+    for (unsigned i = 0; i < vertices.size(); i += 3) {
         addPolygon(new Triangle(
             Point(vertices[i+0].x, vertices[i+0].y, vertices[i+0].z),
             Point(vertices[i+1].x, vertices[i+1].y, vertices[i+1].z),

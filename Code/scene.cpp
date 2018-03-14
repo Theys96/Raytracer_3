@@ -58,6 +58,7 @@ Color Scene::trace(Ray const &ray, int reflection)
     Vector V = -ray.D;                     // The view vector
     Color  I_d;                            // Diffuse light intensity, to be calculated
     Color  I_s;                            // Specular light intensity, to be calculated
+    Color  I_r;                            // Light coming from reflection
     double I_a = material.ka;              // Ambient light intensity
 
     /* Lights calculation */
@@ -72,16 +73,16 @@ Color Scene::trace(Ray const &ray, int reflection)
     }
 
     /* Reflection calculation */
-    if (reflection > 0) {
+    if (reflection > 0 && material.reflection > 0) {
         Vector O = 2*(N.dot(V))*N - V;
-        I_s += trace(Ray(hit, O), reflection-1);
+        I_r = trace(Ray(hit, O), reflection-1);
     }
 
     /* Final combination */
     I_d *= material.kd;
     I_s *= material.ks;
     Color I = I_a + I_d;
-    return I_s + I * obj->colorAt(hit);
+    return I_s + I * obj->colorAt(hit) + material.reflection*I_r;
 }
 
 Color Scene::renderPixel(double x, double y, double pixelSize) {
@@ -114,7 +115,8 @@ void Scene::render(Image &img)
     unsigned h = img.height();
     unsigned resolution = h;
     for (unsigned y = 0; y < h; ++y)
-    {
+    {   
+        // #pragma omp parallel for
         for (unsigned x = 0; x < w; ++x)
         {
             // This will stretch the picture if it is not a square

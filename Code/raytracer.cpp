@@ -109,13 +109,14 @@ Material Raytracer::parseMaterialNode(json const &node) const
     double kd = node["kd"];
     double ks = node["ks"];
     double n  = node["n"];
+    double reflection = node["reflection"];
 
     string tex = node.value("texture", "");
     if (tex == "") {
         Color color(node["color"]);
-        return Material(color, ka, kd, ks, n);
+        return Material(color, ka, kd, ks, n, reflection);
     } else {
-        return Material(sceneDir+"/"+tex, ka, kd, ks, n);
+        return Material(sceneDir+"/"+tex, ka, kd, ks, n, reflection);
     }
 }
 

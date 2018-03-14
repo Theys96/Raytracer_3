@@ -15,27 +15,30 @@ class Material
         double kd;          // diffuse intensity
         double ks;          // specular intensity
         double n;           // exponent for specular highlight size
+        double reflection;
 
         Material() = default;
 
-        Material(Color const &color, double ka, double kd, double ks, double n)
+        Material(Color const &color, double ka, double kd, double ks, double n, double reflection)
         :
             color(color),
             usingTexture(false),
             ka(ka),
             kd(kd),
             ks(ks),
-            n(n)
+            n(n),
+            reflection(reflection)
         {}
 
-        Material(std::string const &texture, double ka, double kd, double ks, double n)
+        Material(std::string const &texture, double ka, double kd, double ks, double n, double reflection)
         :
             texture(new Image(texture)),
             usingTexture(true),
             ka(ka),
             kd(kd),
             ks(ks),
-            n(n)
+            n(n),
+            reflection(reflection)
         {}
 };
 

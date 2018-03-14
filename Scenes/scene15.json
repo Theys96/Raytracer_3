@@ -1,0 +1,76 @@
+{
+    "Eye": [200, 200, 1000],
+    "Shadows": true,
+    "MaxRecursionDepth": 10,
+    "SuperSamplingFactor": 2,
+    "Resolution": 1000,
+    "Lights": [
+        {
+            "position": [0, 750, 0],
+            "color": [1, 0.9, 0.7]
+        }
+    ],
+    "Objects": [
+        {
+            "type": "plane",
+            "comment": "Floor",
+            "position": [200,-600,-200],
+            "normal": [0,1,0],
+            "material":
+            {
+                "color": [0.2,0.6,1.0],
+                "ka": 0.3,
+                "kd": 0.1,
+                "ks": 0.0,
+                "reflection": 0,
+                "n": 1
+            }
+        },
+        {
+            "type": "sphere",
+            "comment": "Earth",
+            "position": [200,-600,-1400],
+            "radius": 600,
+            "material":
+            {
+                "color": [0.5,0.5,0.5],
+                "ka": 0.2,
+                "kd": 0.8,
+                "ks": 0.3,
+                "reflection": 0.5,
+                "n": 1
+            }
+        },
+        {
+            "type": "plane",
+            "comment": "Sky",
+            "position": [200,800,-200],
+            "normal": [0,-1,0],
+            "material":
+            {
+                "color": [0.2,0.6,1.0],
+                "ka": 0.3,
+                "kd": 0.1,
+                "ks": 0.0,
+                "reflection": 0,
+                "n": 1
+            }
+        },
+        {
+        	"type": "sphere",
+        	"position": [200,200,-1400],
+        	"radius": 150,
+            "rotation": [0,0.5,0.5],
+            "angle": 200,
+        	"material":
+            {
+                "texture": "deathstar.png",
+                "ka": 0.4,
+                "kd": 0.3,
+                "ks": 0.0,
+                "reflection": 0.3,
+                "n": 1
+            }
+        }
+    ]
+}
