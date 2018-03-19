@@ -109,7 +109,7 @@ Material Raytracer::parseMaterialNode(json const &node) const
     double kd = node["kd"];
     double ks = node["ks"];
     double n  = node["n"];
-    double reflection = node["reflection"];
+    double reflection = node.value("reflection", ks);
 
     string tex = node.value("texture", "");
     if (tex == "") {

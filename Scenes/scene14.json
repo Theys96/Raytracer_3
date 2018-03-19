@@ -3,7 +3,7 @@
     "Shadows": true,
     "MaxRecursionDepth": 0,
     "SuperSamplingFactor": 4,
-    "Resolution": 500,
+    "Resolution": 2000,
     "Lights": [
         {
             "position": [600, 600, 1500],
@@ -17,12 +17,12 @@
             "position": [200, 200, 400],
             "resolution": 100,
             "radius": 100,
-            "rotation": [0,1,0],
+            "norotation": [0,0,0],
             "angle": 0,
             "material":
             {
                 "comment": "image is relative to scene file here!",
-                "texture": "earthmap1k.png",
+                "texture": "earthmap10k.png",
                 "ka": 0.2,
                 "kd": 0.8,
                 "ks": 0.0,
